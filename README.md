@@ -1,7 +1,8 @@
 # Handy-Scripti
 handy scripts i write during PT and i think would help others
 
-*masscanner-beautifier.py*
+
+# masscanner-beautifier.py
 Date: 26/07/2020
 
 A script to output your mascan results nicely from an XML format
