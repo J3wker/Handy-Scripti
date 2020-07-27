@@ -1,4 +1,5 @@
 import re, os, sys
+from termcolor import colored,cprint
 
 
 if os.path.exists(sys.argv[1].replace(".xml", "")):
@@ -25,22 +26,31 @@ with open(sys.argv[1], "r") as file:
 
         if "</ports>" in line:
             trigger_print = False
-            print(f"\n-----IP: {temp_list[0]}-----\n")
             command = f"nmap {temp_list[0]} -Pn -sC -sV --open -p"
-            for i in range(1,len(temp_list)):
-                command = command + f"{temp_list[i]},"
-                if "443" in temp_list[i]:
-                    print(f"Open in Browser:\n https://{temp_list[0]}:{temp_list[i]}/\n")
-                else:
-                    print(f"Open in Browser:\n http://{temp_list[0]}:{temp_list[i]}/\n")
+            if len(temp_list) == 1:
+                temp_list.clear()
+                continue
+            else:
+                cprint(f"\n-----------------------------------------------\nIP: {temp_list[0]}", "red")
+                command = f"nmap {temp_list[0]} -v -Pn -sC -sV -p"
+                for i in range(1, len(temp_list)):
+                    if "443" in temp_list[i]:
+                        cprint(f"\t{temp_list[i]}   :   Open\nOpen in Browser: https://{temp_list[0]}:{temp_list[i]}/", "green")
+                    else:
+                        cprint(f"\t{temp_list[i]}   :   Open\nOpen in Browser: http://{temp_list[0]}:{temp_list[i]}/", "green")
 
-                os.system(f"echo {temp_list[0]} >> {sys.argv[1].replace('.xml', '')}/{temp_list[i]}.txt")
+                    command = command + temp_list[i] + ","
+                    os.system(f"echo {temp_list[0]} >> {sys.argv[1].replace('.xml', '')}/{temp_list[i]}.txt")
+
                 if choise == "y".lower():
-                    if command.endswith(","):
-                        command = command[:len(command)-1]
+                    cprint("\n----------Enumerating----------\n", "red")
+                    print(f"Using the following command: {command[:len(command)-1]}\n")
+                    os.system(command[:len(command)-1])
+                    cprint("\n\n-------------------------Done----------------------\n\n", "red")
+                else:
+                    print(f"Use the following for nmap scan: {command[:len(command)-1]}\n")
 
-                    os.system(command)
-            print("\n-------------------------Done---------------------------\n")
 
+            command = ""
             temp_list.clear()
         
