@@ -21,8 +21,10 @@ with open(sys.argv[1], "r") as file:
 
         if trigger_print == True:
             port = re.search('(?:portid=)"(\\d*)"(?:>)', line)
+            state = re.search('(?:state=")(\w*)(?:")', line)
             if port:
-                temp_list.append(port.group(1))
+                if state != 'closed' and state != 'filtered':
+                    temp_list.append(port.group(1))
 
         if "</ports>" in line:
             trigger_print = False
@@ -32,7 +34,7 @@ with open(sys.argv[1], "r") as file:
                 continue
             else:
                 cprint(f"\n-----------------------------------------------\nIP: {temp_list[0]}", "red")
-                command = f"nmap {temp_list[0]} -v -Pn -sC -sV -p"
+                command = f"nmap {temp_list[0]} -v -Pn --open -sC -sV -p"
                 for i in range(1, len(temp_list)):
                     if "443" in temp_list[i]:
                         cprint(f"\t{temp_list[i]}   :   Open\nOpen in Browser: https://{temp_list[0]}:{temp_list[i]}/", "green")
